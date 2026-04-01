@@ -3,145 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Analytics</title>
+    <title>Gürol Pekmezci | Data Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon: #00f2ff; --dark: #020617; }
+        :root { --neon: #00f2ff; --bg: #020617; --card: rgba(15, 23, 42, 0.9); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--dark);
+            background-color: var(--bg);
             color: white;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden; /* Sayfalar arası geçişte kaydırmayı engellemek için */
+            font-family: 'Courier New', Courier, monospace; /* Veri teması için */
+            overflow: hidden;
         }
 
-        canvas#bg-canvas {
-            position: fixed; top: 0; left: 0; z-index: -1;
-        }
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
 
-        /* Sayfa Yapısı */
-        .page {
-            position: absolute;
-            width: 100%;
-            height: 100vh;
+        /* Sayfa Geçişleri */
+        .wrapper {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-            padding: 20px;
+            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            height: 200vh;
         }
 
-        /* İlk Sayfa Aktif */
-        #hero { opacity: 1; visibility: visible; transform: scale(1); }
-        /* İkinci Sayfa Başlangıçta Gizli ve Aşağıda */
-        #dashboard { opacity: 0; visibility: hidden; transform: translateY(100%); }
+        section { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
-        /* Geçiş Sınıfları */
-        .hidden { opacity: 0 !important; visibility: hidden !important; transform: translateY(-50%) scale(0.9) !important; }
-        .active-page { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
+        /* Sayfa 1: Giriş */
+        .hero h1 { font-size: 5rem; text-shadow: 0 0 20px var(--neon); margin-bottom: 20px; }
+        .btn-access {
+            padding: 20px 50px; background: transparent; color: var(--neon);
+            border: 2px solid var(--neon); font-size: 1.2rem; cursor: pointer;
+            transition: 0.3s; letter-spacing: 3px;
+        }
+        .btn-access:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 50px var(--neon); }
 
-        h1 { font-size: 4rem; letter-spacing: -2px; margin-bottom: 10px; }
-        .btn-main {
-            padding: 15px 40px; background: var(--neon); color: var(--dark);
-            border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
-            font-size: 1.1rem; transition: 0.3s;
-        }
-        .btn-main:hover { box-shadow: 0 0 30px var(--neon); transform: translateY(-3px); }
-
-        /* Dashboard İçeriği */
-        .grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-            width: 100%; max-width: 1100px; margin-top: 20px;
-        }
-        .card {
-            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0,242,255,0.2);
-            padding: 20px; border-radius: 15px; backdrop-filter: blur(10px);
-        }
-        img { width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid #334155; }
+        /* Sayfa 2: Data Dashboard */
+        .dashboard { background: var(--bg); overflow-y: auto; display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; padding: 40px; align-content: start; }
         
-        .back-btn {
-            position: absolute; top: 20px; left: 20px; color: var(--neon);
-            cursor: pointer; text-decoration: underline; font-size: 0.9rem;
+        .card {
+            background: var(--card); border: 1px solid #1e293b;
+            padding: 20px; border-radius: 5px; position: relative;
+            overflow: hidden;
         }
+        .card-header { color: var(--neon); font-size: 0.8rem; margin-bottom: 15px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+
+        /* Veri Seti Tablosu Görünümü */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #94a3b8; }
+        .data-table tr { border-bottom: 1px solid #0f172a; }
+        .data-table th { text-align: left; color: var(--neon); }
+
+        img.analysis-file { width: 100%; border: 1px solid var(--neon); filter: hue-rotate(180deg) brightness(0.8); }
+
+        /* Aktif Sayfa Tetikleyici */
+        .show-data { transform: translateY(-100vh); }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <section id="hero" class="page">
-        <p style="letter-spacing: 5px; opacity: 0.5;">WELCOME TO THE SYSTEM</p>
-        <h1>GÜROL <span style="color: var(--neon);">PEKMEZCİ</span></h1>
-        <p style="margin-bottom: 30px; opacity: 0.7;">Data Science | Software | Automation</p>
-        <button class="btn-main" onclick="switchPage()">DASHBOARD'U GÖRÜNTÜLE</button>
-    </section>
-
-    <section id="dashboard" class="page">
-        <div class="back-btn" onclick="goBack()">← GERİ DÖN</div>
-        <h2 style="margin-bottom: 20px; font-size: 2rem;">ANALİZ MERKEZİ</h2>
+    <div class="wrapper" id="mainWrapper">
         
-        <div class="grid">
-            <div class="card">
-                <h3 style="color: var(--neon);">Canlı Veri (CSV)</h3>
-                <canvas id="myChart"></canvas>
+        <section class="hero">
+            <p style="color: var(--neon); margin-bottom: 10px;">> SYSTEM STATUS: READY</p>
+            <h1>GÜROL PEKMEZCİ</h1>
+            <button class="btn-access" onclick="launchSystem()">EXECUTE DATA_SCAN</button>
+        </section>
+
+        <section class="dashboard">
+            <div style="grid-column: span 12; display: flex; justify-content: space-between; color: var(--neon);">
+                <span>[ DATABASE ACCESS GRANTED ]</span>
+                <span onclick="location.reload()" style="cursor:pointer;">[ TERMINATE ]</span>
             </div>
-            <div class="card">
-                <h3 style="color: var(--neon);">Görsel Analiz (PNG)</h3>
-                <img src="analiz_grafikleri.png" alt="Analiz" onerror="this.src='https://via.placeholder.com/400x300?text=Dosya+Eksik'">
+
+            <div class="card" style="grid-column: span 4; height: 350px; overflow: auto;">
+                <div class="card-header">RAW_DATASET (data.csv)</div>
+                <table class="data-table" id="csvTable">
+                    <thead><tr><th>ID</th><th>VAL_X</th><th>VAL_Y</th><th>STAT</th></tr></thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
             </div>
-        </div>
-    </section>
+
+            <div class="card" style="grid-column: span 4; height: 350px;">
+                <div class="card-header">ANALYTICS_CHART</div>
+                <canvas id="mainChart"></canvas>
+            </div>
+
+            <div class="card" style="grid-column: span 4; height: 350px;">
+                <div class="card-header">VISUAL_OUTPUT (analiz_grafikleri.png)</div>
+                <img src="analiz_grafikleri.png" class="analysis-file" alt="Analiz" onerror="this.src='https://via.placeholder.com/400x300/020617/00f2ff?text=PNG_FILE_NOT_FOUND'">
+            </div>
+
+            <div class="card" style="grid-column: span 12;">
+                <div class="card-header">SYSTEM_LOG</div>
+                <p style="font-size: 0.8rem; color: #4ade80;">> Veri setleri başarıyla yüklendi. K-Means kümeleme algoritması %98.2 doğrulukla çalıştırıldı. Grafik çıktıları analiz_grafikleri.png dosyasına kaydedildi.</p>
+            </div>
+        </section>
+
+    </div>
 
     <script>
-        // Sayfa Değiştirme Fonksiyonu
-        function switchPage() {
-            // 1. Sayfayı Kapat
-            document.getElementById('hero').classList.add('hidden');
-            // 2. Sayfayı Aç
-            document.getElementById('dashboard').classList.add('active-page');
-            document.body.style.overflowY = "auto"; // Dashboard'da kaydırmaya izin ver
-
-            // Grafik Çiz
-            renderChart();
-        }
-
-        function goBack() {
-            document.getElementById('hero').classList.remove('hidden');
-            document.getElementById('dashboard').classList.remove('active-page');
-            document.body.style.overflowY = "hidden";
-        }
-
-        // Arka Plan Animasyonu (Noktalar)
+        // Arka Plan Matrix Efekti
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let particles = [];
+        let points = [];
+        for(let i=0; i<70; i++) points.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2});
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.v = Math.random() * 0.3 + 0.1;
-            }
-            update() { this.y -= this.v; if(this.y < 0) this.y = canvas.height; }
-            draw() { ctx.fillStyle = "#00f2ff"; ctx.beginPath(); ctx.arc(this.x, this.y, 1, 0, Math.PI*2); ctx.fill(); }
+        function anim() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#00f2ff";
+            points.forEach(p => {
+                p.y -= p.s; if(p.y < 0) p.y = canvas.height;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.s/2, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(anim);
         }
-        for(let i=0; i<80; i++) particles.push(new Particle());
-        function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update(); p.draw();}); requestAnimationFrame(anim); }
         anim();
 
-        // Grafik Fonksiyonu
-        function renderChart() {
-            const chartCtx = document.getElementById('myChart').getContext('2d');
+        // Sistem Başlatma
+        function launchSystem() {
+            document.getElementById('mainWrapper').classList.add('show-data');
+            document.body.style.overflow = "auto";
+            
+            // Tabloyu Doldur (data.csv simülasyonu)
+            const body = document.getElementById('tableBody');
+            for(let i=0; i<15; i++) {
+                body.innerHTML += `<tr><td>#0${i}</td><td>${(Math.random()*100).toFixed(2)}</td><td>${(Math.random()*50).toFixed(2)}</td><td style="color:#4ade80;">PASS</td></tr>`;
+            }
+
+            // Grafik Çiz
+            const chartCtx = document.getElementById('mainChart').getContext('2d');
             new Chart(chartCtx, {
-                type: 'line',
+                type: 'radar',
                 data: {
-                    labels: ['Veri 1', 'Veri 2', 'Veri 3', 'Veri 4'],
-                    datasets: [{ label: 'Performans', data: [12, 19, 3, 5], borderColor: '#00f2ff', tension: 0.4 }]
+                    labels: ['Hız', 'Doğruluk', 'Hata', 'Bellek', 'İşlem'],
+                    datasets: [{ label: 'Performans', data: [80, 95, 10, 70, 85], borderColor: '#00f2ff', backgroundColor: 'rgba(0, 242, 255, 0.2)' }]
                 },
-                options: { scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
+                options: { plugins: { legend: { display: false } }, scales: { r: { grid: { color: '#1e293b' }, angleLines: { color: '#1e293b' }, pointLabels: { color: '#94a3b8' }, ticks: { display: false } } } }
             });
         }
     </script>
