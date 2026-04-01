@@ -3,114 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Portfolio</title>
+    <title>Gürol Pekmezci | Analytics Portfolio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #0f172a; color: white;
-            font-family: 'Segoe UI', sans-serif;
+        :root {
+            --neon-blue: #00f2ff;
+            --deep-dark: #020617;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--deep-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            display: flex; flex-direction: column; align-items: center;
+            scroll-behavior: smooth;
         }
 
-        /* Arka Plan Hareketli Noktalar */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        /* Işık Efekti */
-        #glow {
-            position: fixed; width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
-            border-radius: 50%; pointer-events: none; z-index: 0;
-            transform: translate(-50%, -50%);
+        /* Arka Plan Hareketli Geometri */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; z-index: -1;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
         }
 
-        .hero { text-align: center; margin-top: 100px; z-index: 10; }
-        h1 { font-size: 4rem; margin-bottom: 10px; color: #38bdf8; }
-        p { opacity: 0.6; letter-spacing: 2px; }
+        /* Yükleme Ekranı (Preloader) */
+        #loader {
+            position: fixed; width: 100%; height: 100%; background: var(--deep-dark);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 1s ease;
+        }
+        .loader-bar { width: 200px; height: 2px; background: #1e293b; position: relative; margin-top: 20px; }
+        .loader-fill { position: absolute; height: 100%; background: var(--neon-blue); width: 0%; animation: load 2s forwards; }
+        @keyframes load { to { width: 100%; } }
 
-        .btn-show {
-            margin-top: 30px; padding: 15px 40px;
-            background: #38bdf8; color: #0f172a;
-            border: none; border-radius: 50px; font-weight: bold;
-            cursor: pointer; transition: 0.3s; font-size: 1.1rem;
+        /* Ana Ekran (Hero) */
+        section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        
+        .hero-content { text-align: center; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s 2.2s forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1;
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #fff 30%, var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.3));
         }
 
-        .btn-show:hover { transform: scale(1.05); box-shadow: 0 0 20px #38bdf8; }
+        .typing-text { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); letter-spacing: 4px; font-size: 1.2rem; margin-bottom: 40px; }
 
-        /* Dashboard Alanı - Başlangıçta Kapalı */
+        /* Buton Tasarımı */
+        .cyber-btn {
+            padding: 20px 60px;
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .cyber-btn:hover {
+            background: var(--neon-blue);
+            color: var(--deep-dark);
+            box-shadow: 0 0 50px var(--neon-blue);
+        }
+
+        /* Dashboard Alanı */
         #dashboard {
-            display: none; width: 90%; max-width: 1000px;
-            margin: 50px 0; gap: 20px; z-index: 10;
-        }
-
-        .card {
-            flex: 1; background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #38bdf8; border-radius: 15px;
-            padding: 20px; backdrop-filter: blur(5px);
-            min-width: 300px;
-        }
-
-        img { width: 100%; border-radius: 10px; border: 1px solid #334155; margin-top: 15px; }
-
-        @media (max-width: 768px) { #dashboard { flex-direction: column; } }
-    </style>
-</head>
-<body>
-
-    <div id="glow"></div>
-    <canvas id="bg-canvas"></canvas>
-
-    <div class="hero">
-        <h1>GÜROL PEKMEZCİ</h1>
-        <p>VERİ ANALİZİ VE YAZILIM PROJELERİ</p>
-        <button class="btn-show" onclick="startData()">VERİLERİ VE GRAFİKLERİ GÖR</button>
-    </div>
-
-    <div id="dashboard">
-        <div class="card">
-            <h3>Performans Analizi (CSV Verisi)</h3>
-            <canvas id="myChart"></canvas>
-        </div>
-
-        <div class="card">
-            <h3>Görselleştirme Çıktısı (PNG)</h3>
-            <img src="analiz_grafikleri.png" alt="Analiz Grafiği" onerror="this.src='https://via.placeholder.com/400x300?text=Görsel+Yüklenemedi'">
-        </div>
-    </div>
-
-    <script>
-        // 1. Işık Takibi
-        const glow = document.getElementById('glow');
-        document.addEventListener('mousemove', (e) => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
-
-        // 2. Hareketli Arka Plan
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let particles = [];
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.v = Math.random() * 0.5 + 0.1;
-            }
-            update() {
-                this.y -= this.v;
-                if(this.y < 0) this.y = canvas.height;
-            }
-            draw() {
-                ctx.fillStyle = "rgba(56, 189, 248, 0.4)";
-                ctx.beginPath(); ctx.arc(this.x, this.y, 1.2, 0, Math.PI*2); ctx.fill();
-            }
-        }
-
-        for(let i=0; i<100; i++) particles.push(new Particle());
-
-        function animate() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            particles.forEach(p => { p.update();
+            width: 100%;
+            max-width: 1300px;
+            display: none; /* Butona basınca açılacak */
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+            margin-top: 50px
