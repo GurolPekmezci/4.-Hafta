@@ -3,88 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Analytics Portfolio</title>
+    <title>Gürol Pekmezci | Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --neon-blue: #00f2ff;
-            --deep-dark: #020617;
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
+        :root { --neon: #00f2ff; --dark: #020617; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--deep-dark);
-            color: #f8fafc;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; /* Sayfalar arası geçişte kaydırmayı engellemek için */
         }
 
-        /* Arka Plan Hareketli Geometri */
-        #bg-canvas {
+        canvas#bg-canvas {
             position: fixed; top: 0; left: 0; z-index: -1;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
         }
 
-        /* Yükleme Ekranı (Preloader) */
-        #loader {
-            position: fixed; width: 100%; height: 100%; background: var(--deep-dark);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999; transition: opacity 1s ease;
-        }
-        .loader-bar { width: 200px; height: 2px; background: #1e293b; position: relative; margin-top: 20px; }
-        .loader-fill { position: absolute; height: 100%; background: var(--neon-blue); width: 0%; animation: load 2s forwards; }
-        @keyframes load { to { width: 100%; } }
-
-        /* Ana Ekran (Hero) */
-        section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
-        
-        .hero-content { text-align: center; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s 2.2s forwards; }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(3rem, 8vw, 6rem);
-            line-height: 1;
-            margin-bottom: 10px;
-            background: linear-gradient(to bottom, #fff 30%, var(--neon-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.3));
-        }
-
-        .typing-text { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); letter-spacing: 4px; font-size: 1.2rem; margin-bottom: 40px; }
-
-        /* Buton Tasarımı */
-        .cyber-btn {
-            padding: 20px 60px;
-            background: transparent;
-            color: var(--neon-blue);
-            border: 1px solid var(--neon-blue);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            letter-spacing: 2px;
-            cursor: pointer;
-            position: relative;
-            transition: var(--transition);
-            overflow: hidden;
-        }
-        .cyber-btn:hover {
-            background: var(--neon-blue);
-            color: var(--deep-dark);
-            box-shadow: 0 0 50px var(--neon-blue);
-        }
-
-        /* Dashboard Alanı */
-        #dashboard {
+        /* Sayfa Yapısı */
+        .page {
+            position: absolute;
             width: 100%;
-            max-width: 1300px;
-            display: none; /* Butona basınca açılacak */
-            grid-template-columns: repeat(12, 1fr);
-            gap: 25px;
-            margin-top: 50px
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+            padding: 20px;
+        }
+
+        /* İlk Sayfa Aktif */
+        #hero { opacity: 1; visibility: visible; transform: scale(1); }
+        /* İkinci Sayfa Başlangıçta Gizli ve Aşağıda */
+        #dashboard { opacity: 0; visibility: hidden; transform: translateY(100%); }
+
+        /* Geçiş Sınıfları */
+        .hidden { opacity: 0 !important; visibility: hidden !important; transform: translateY(-50%) scale(0.9) !important; }
+        .active-page { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
+
+        h1 { font-size: 4rem; letter-spacing: -2px; margin-bottom: 10px; }
+        .btn-main {
+            padding: 15px 40px; background: var(--neon); color: var(--dark);
+            border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
+            font-size: 1.1rem; transition: 0.3s;
+        }
+        .btn-main:hover { box-shadow: 0 0 30px var(--neon); transform: translateY(-3px); }
+
+        /* Dashboard İçeriği */
+        .grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            width: 100%; max-width: 1100px; margin-top: 20px;
+        }
+        .card {
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0,242,255,0.2);
+            padding: 20px; border-radius: 15px; backdrop-filter: blur(10px);
+        }
+        img { width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid #334155; }
+        
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; color: var(--neon);
+            cursor: pointer; text-decoration: underline; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <section id="hero" class="page">
+        <p style="letter-spacing: 5px; opacity: 0.5;">WELCOME TO THE SYSTEM</p>
+        <h1>GÜROL <span style="color: var(--neon);">PEKMEZCİ</span></h1>
+        <p style="margin-bottom: 30px; opacity: 0.7;">Data Science | Software | Automation</p>
+        <button class="btn-main" onclick="switchPage()">DASHBOARD'U GÖRÜNTÜLE</button>
+    </section>
+
+    <section id="dashboard" class="page">
+        <div class="back-btn" onclick="goBack()">← GERİ DÖN</div>
+        <h2 style="margin-bottom: 20px; font-size: 2rem;">ANALİZ MERKEZİ</h2>
+        
+        <div class="grid">
+            <div class="card">
+                <h3 style="color: var(--neon);">Canlı Veri (CSV)</h3>
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="card">
+                <h3 style="color: var(--neon);">Görsel Analiz (PNG)</h3>
+                <img src="analiz_grafikleri.png" alt="Analiz" onerror="this.src='https://via.placeholder.com/400x300?text=Dosya+Eksik'">
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Sayfa Değiştirme Fonksiyonu
+        function switchPage() {
+            // 1. Sayfayı Kapat
+            document.getElementById('hero').classList.add('hidden');
+            // 2. Sayfayı Aç
+            document.getElementById('dashboard').classList.add('active-page');
+            document.body.style.overflowY = "auto"; // Dashboard'da kaydırmaya izin ver
+
+            // Grafik Çiz
+            renderChart();
+        }
+
+        function goBack() {
+            document.getElementById('hero').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('active-page');
+            document.body.style.overflowY = "hidden";
+        }
+
+        // Arka Plan Animasyonu (Noktalar)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.v = Math.random() * 0.3 + 0.1;
+            }
+            update() { this.y -= this.v; if(this.y < 0) this.y = canvas.height; }
+            draw() { ctx.fillStyle = "#00f2ff"; ctx.beginPath(); ctx.arc(this.x, this.y, 1, 0, Math.PI*2); ctx.fill(); }
+        }
+        for(let i=0; i<80; i++) particles.push(new Particle());
+        function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update(); p.draw();}); requestAnimationFrame(anim); }
+        anim();
+
+        // Grafik Fonksiyonu
+        function renderChart() {
+            const chartCtx = document.getElementById('myChart').getContext('2d');
+            new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Veri 1', 'Veri 2', 'Veri 3', 'Veri 4'],
+                    datasets: [{ label: 'Performans', data: [12, 19, 3, 5], borderColor: '#00f2ff', tension: 0.4 }]
+                },
+                options: { scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
+            });
+        }
+    </script>
+</body>
+</html>
