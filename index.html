@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Data Portfolio</title>
+    <title>Gürol Pekmezci | Data Engine v2.5</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -11,6 +11,7 @@
             --bg: #020617; 
             --card-bg: rgba(15, 23, 42, 0.95); 
             --border: rgba(0, 242, 255, 0.2);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,12 +19,14 @@
         body {
             background-color: var(--bg);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            font-family: var(--font);
+            overflow: hidden; /* Girişte kaydırmayı kapatıyoruz */
         }
 
+        /* Arka Plan Hareketli Geometri */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
 
+        /* Sayfa Kapsayıcı (Kaydırma Efekti İçin) */
         .wrapper {
             display: flex;
             flex-direction: column;
@@ -33,40 +36,235 @@
 
         section { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
-        /* --- PROFİL ALANI --- */
-        .profile-wrap {
-            width: 140px; height: 140px;
-            margin-bottom: 20px;
+        /* --- SAYFA 1: GİRİŞ (HERO) --- */
+        .hero { text-align: center; }
+        
+        /* PROFIL FOTOĞRAFI ALANI */
+        .profile-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
             position: relative;
         }
+        
         .profile-pic {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            border: 2px solid var(--neon);
-            object-fit: cover;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            border: 3px solid var(--neon);
+            object-fit: cover; /* Fotoğrafı kare içine sığdırır */
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            transition: 0.5s;
         }
+        
+        .profile-pic:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.5);
+        }
+        
+        /* Neon Ring Efekti (Opsiyonel, fotoğrafın arkasında döner) */
+        .profile-container::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--neon);
+            border-bottom-color: var(--neon);
+            animation: spinRing 4s linear infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes spinRing { to { transform: rotate(360deg); } }
 
         .hero h1 { 
-            font-size: clamp(2.5rem, 8vw, 5rem); 
+            font-size: clamp(3rem, 10vw, 5rem); 
             font-weight: 900; 
+            letter-spacing: -3px;
             background: linear-gradient(to bottom, #fff, var(--neon));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
+        
+        .hero p.tagline { opacity: 0.5; letter-spacing: 5px; margin-bottom: 40px; text-transform: uppercase; font-size: 0.8rem;}
 
         .btn-access {
-            padding: 15px 40px; background: transparent; color: var(--neon);
-            border: 2px solid var(--neon); cursor: pointer;
-            transition: 0.3s; font-weight: bold; letter-spacing: 2px;
+            padding: 18px 50px; background: transparent; color: var(--neon);
+            border: 2px solid var(--neon); border-radius: 4px; font-weight: bold;
+            cursor: pointer; transition: 0.4s; font-size: 1.1rem; letter-spacing: 2px;
+            font-family: var(--font);
         }
-        .btn-access:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 40px var(--neon); }
+        .btn-access:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 50px rgba(0, 242, 255, 0.4); transform: translateY(-3px); }
 
-        /* --- DASHBOARD --- */
+        /* --- SAYFA 2: DASHBOARD (Önceki kodla aynı) --- */
         .dashboard { 
             background: #010409; 
             display: grid; 
             grid-template-columns: repeat(12, 1fr); 
-            gap: 20px; padding: 40px;
-            overflow-y: auto
+            gap: 20px; 
+            padding: 40px;
+            overflow-y: auto;
+            align-content: start;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 20px; 
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .card:hover { border-color: rgba(0, 242, 255, 0.5); }
+
+        .card-header { 
+            font-size: 0.7rem; color: var(--neon); 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; letter-spacing: 1px;
+        }
+
+        /* Veri Tablosu (CSV Görünümü) */
+        .csv-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: #94a3b8; }
+        .csv-table th { color: var(--neon); text-align: left; padding: 5px; border-bottom: 1px solid #1e293b;}
+        .csv-table td { padding: 5px; border-bottom: 1px solid #0f172a; }
+
+        /* Senin Analiz Görselin (PNG) */
+        .main-analysis-img { 
+            width: 100%; 
+            height: auto; 
+            border-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.5s;
+        }
+        .main-analysis-img:hover { border-color: var(--neon); transform: scale(1.01); }
+
+        /* Sayfa Geçiş Tetikleyici */
+        .show-data { transform: translateY(-100vh); }
+
+        @media (max-width: 1024px) { .card { grid-column: span 12 !important; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="wrapper" id="mainWrapper">
+        
+        <section class="hero">
+            <div class="profile-container">
+                <img src="profil.jpg" class="profile-pic" alt="Gürol Pekmezci Profil" 
+                     onerror="this.src='https://via.placeholder.com/150/020617/00f2ff?text=GÜROL'">
+            </div>
+            
+            <p>> SYSTEM STATUS: ONLINE</p>
+            <h1>GÜROL PEKMEZCİ</h1>
+            <p class="tagline">DATA SCIENCE & AUTOMATION ENTHUSIAST</p>
+            <button class="btn-access" onclick="launchSystem()">EXECUTE DATA_SCAN</button>
+        </section>
+
+        <section class="dashboard">
+            <div style="grid-column: span 12; display:flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid #1e293b; margin-bottom: 10px;">
+                <h2 style="font-size: 1rem; color: var(--neon); font-weight: bold;">[ DATABASE ACCESS GRANTED ]</h2>
+                <button onclick="location.reload()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">[ TERMINATE ]</button>
+            </div>
+
+            <div class="card" style="grid-column: span 4; height: 380px; overflow: auto;">
+                <div class="card-header">RAW_DATA_STREAM (data.csv)</div>
+                <table class="csv-table">
+                    <thead><tr><th>ID</th><th>VAL_X</th><th>VAL_Y</th><th>STATUS</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card" style="grid-column: span 8; height: 380px;">
+                <div class="card-header">ALGORITHMIC_PERFORMANCE (SystemMetrics)</div>
+                <canvas id="mainChart"></canvas>
+            </div>
+
+            <div class="card" style="grid-column: span 12;">
+                <div class="card-header">VISUAL_ANALYSIS_OUTPUT (analiz_grafikleri.png)</div>
+                <div style="display: flex; gap: 25px; align-items: start;">
+                    <img src="analiz_grafikleri.png" class="main-analysis-img" alt="K-Means Kümeleme Grafiği" 
+                         onerror="this.src='https://via.placeholder.com/1000x400/020617/00f2ff?text=analiz_grafikleri.png+Bulunamadi'">
+                    
+                    <div style="min-width: 280px; font-size: 0.9rem; color: #94a3b8; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px;">
+                        <h4 style="color:var(--neon); margin-bottom: 10px;">Model Özeti:</h4>
+                        <p>• Algoritma: K-Means Clustering<br>
+                           • Veri Noktaları: 500+<br>
+                           • Küme Sayısı (k): 3<br>
+                           • Doğruluk Skoru: %98.2<br>
+                           • Outlier Durumu: Temizlendi
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Arka Plan Hareketli Noktalar
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let points = [];
+        for(let i=0; i<70; i++) points.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2});
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#00f2ff";
+            points.forEach(p => {
+                p.y -= 0.5; if(p.y < 0) p.y = canvas.height;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.s/2, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Sistem Başlatma ve Dashboard'a Geçiş
+        function launchSystem() {
+            // Sayfayı kaydır
+            document.getElementById('mainWrapper').classList.add('show-data');
+            // Dashboard'da kaydırmaya izin ver
+            document.body.style.overflowY = "auto";
+
+            // Tabloyu Doldur (data.csv simülasyonu)
+            const body = document.getElementById('tableBody');
+            for(let i=1; i<=15; i++) {
+                body.innerHTML += `<tr><td>#${100+i}</td><td>${(Math.random()*100).toFixed(2)}</td><td>${(Math.random()*50).toFixed(2)}</td><td style="color:#4ade80;">PASS</td></tr>`;
+            }
+
+            // Grafik Çiz (Radar)
+            const chartCtx = document.getElementById('mainChart').getContext('2d');
+            new Chart(chartCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Hız', 'Doğruluk', 'Model', 'Bellek', 'İşlem'],
+                    datasets: [{
+                        label: 'Sistem Metrikleri',
+                        data: [80, 95, 88, 70, 85],
+                        borderColor: '#00f2ff',
+                        backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 2
+                    }]
+                },
+                options: { 
+                    plugins: { legend: { labels: { color: 'white', font: {size: 11} } } },
+                    scales: { 
+                        r: { 
+                            grid: { color: 'rgba(255,255,255,0.05)' }, 
+                            angleLines: { color: 'rgba(255,255,255,0.05)' }, 
+                            pointLabels: { color: '#94a3b8', font: {size: 10} }, 
+                            ticks: { display: false } 
+                        } 
+                    } 
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+    </script>
+</body>
+</html>
