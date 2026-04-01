@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hareketli Geometrik Arka Plan</title>
+    <title>Gürol Pekmezci | Digital Portfolio</title>
     <style>
-        /* Modern ve temiz bir font */
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0f172a; /* Derin lacivert arka plan */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         #canvas {
@@ -23,7 +22,7 @@
             z-index: 1;
         }
 
-        /* İçerik katmanı */
+        /* İçerik Katmanı */
         .content {
             position: relative;
             z-index: 2;
@@ -34,18 +33,75 @@
             height: 100vh;
             color: white;
             text-align: center;
-            pointer-events: none; /* Arka plandaki etkileşimi engellememesi için */
         }
 
         h1 {
-            font-size: 3rem;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5);
-            margin-bottom: 10px;
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            drop-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        p {
-            font-size: 1.2rem;
-            opacity: 0.8;
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.6;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Buton Grubu */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            pointer-events: all; /* Butonların tıklanabilir olması için */
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: rgba(15, 23, 42, 0.6);
+            color: #38bdf8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* Tıklama Mesajı */
+        #alert-box {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            background: rgba(56, 189, 248, 0.9);
+            color: #0f172a;
+            border-radius: 50px;
+            font-weight: bold;
+            display: none;
+            z-index: 10;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
         }
     </style>
 </head>
@@ -53,72 +109,66 @@
 
     <canvas id="canvas"></canvas>
 
+    <div id="alert-box">Modül hazırlanıyor...</div>
+
     <div class="content">
-        <h1>Geleceğin Arayüzü</h1>
-        <p>Hareketli geometrik ağ yapısı ile dinamik bir deneyim.</p>
+        <h1>Gürol Pekmezci</h1>
+        <div class="subtitle">Veri Analizi & Yazılım Geliştirme</div>
+        
+        <div class="btn-group">
+            <button class="btn" onclick="showAlert('Veri setleri yükleniyor...')">Datalar</button>
+            <button class="btn" onclick="showAlert('Grafik motoru başlatılıyor...')">Grafikler</button>
+        </div>
     </div>
 
     <script>
+        // Arka Plan Animasyonu (Particles)
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         const properties = {
-            bgColor: 'rgba(15, 23, 42, 1)',
-            particleColor: 'rgba(56, 189, 248, 0.7)', // Açık mavi tonu
-            particleRadius: 3,
-            particleCount: 80,
-            particleMaxVelocity: 0.5,
-            lineLength: 150,
-            particleLife: 6
+            particleColor: 'rgba(56, 189, 248, 0.5)',
+            particleRadius: 2,
+            particleCount: 100,
+            particleMaxVelocity: 0.4,
+            lineLength: 150
         };
 
-        window.onresize = function() {
-            canvas.width = innerWidth;
-            canvas.height = innerHeight;
-        };
-
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
+        window.onresize = () => { canvas.width = innerWidth; canvas.height = innerHeight; };
+        canvas.width = innerWidth; canvas.height = innerHeight;
 
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.velocityX = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
-                this.velocityY = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                this.vx = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                this.vy = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
             }
-
-            position() {
-                if (this.x + this.velocityX > canvas.width || this.x + this.velocityX < 0) this.velocityX *= -1;
-                if (this.y + this.velocityY > canvas.height || this.y + this.velocityY < 0) this.velocityY *= -1;
-                this.x += this.velocityX;
-                this.y += this.velocityY;
+            update() {
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                this.x += this.vx; this.y += this.vy;
             }
-
-            reDraw() {
+            draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, properties.particleRadius, 0, Math.PI * 2);
-                ctx.closePath();
                 ctx.fillStyle = properties.particleColor;
                 ctx.fill();
             }
         }
 
         function drawLines() {
-            let x, y, distance, opacity;
-            for (let i in particles) {
-                for (let j in particles) {
-                    x = particles[i].x - particles[j].x;
-                    y = particles[i].y - particles[j].y;
-                    distance = Math.sqrt(x * x + y * y);
-                    if (distance < properties.lineLength) {
-                        opacity = 1 - distance / properties.lineLength;
-                        ctx.lineWidth = '0.5';
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < properties.lineLength) {
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${1 - dist/properties.lineLength})`;
+                        ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.closePath();
                         ctx.stroke();
                     }
                 }
@@ -127,22 +177,21 @@
 
         function loop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i in particles) {
-                particles[i].position();
-                particles[i].reDraw();
-            }
+            particles.forEach(p => { p.update(); p.draw(); });
             drawLines();
             requestAnimationFrame(loop);
         }
 
-        function init() {
-            for (let i = 0; i < properties.particleCount; i++) {
-                particles.push(new Particle());
-            }
-            loop();
-        }
+        for (let i = 0; i < properties.particleCount; i++) particles.push(new Particle());
+        loop();
 
-        init();
+        // Buton Etkileşimi Fonksiyonu
+        function showAlert(msg) {
+            const box = document.getElementById('alert-box');
+            box.innerText = msg;
+            box.style.display = 'block';
+            setTimeout(() => { box.style.display = 'none'; }, 2500);
+        }
     </script>
 </body>
 </html>
