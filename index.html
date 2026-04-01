@@ -3,71 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Veri Portfolyosu</title>
+    <title>Gürol Pekmezci | Portfolio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #38bdf8; --bg: #0f172a; }
-        
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg);
-            color: white; font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #0f172a; color: white;
+            font-family: 'Segoe UI', sans-serif;
             overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* Arka Plan Hareketli Şekiller */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
+        /* Arka Plan Hareketli Noktalar */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-        /* Fare Takip Efekti */
+        /* Işık Efekti */
         #glow {
             position: fixed; width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
             border-radius: 50%; pointer-events: none; z-index: 0;
             transform: translate(-50%, -50%);
         }
 
-        .main-container {
-            position: relative; z-index: 10;
-            max-width: 1000px; margin: 0 auto;
-            padding: 100px 20px; text-align: center;
+        .hero { text-align: center; margin-top: 100px; z-index: 10; }
+        h1 { font-size: 4rem; margin-bottom: 10px; color: #38bdf8; }
+        p { opacity: 0.6; letter-spacing: 2px; }
+
+        .btn-show {
+            margin-top: 30px; padding: 15px 40px;
+            background: #38bdf8; color: #0f172a;
+            border: none; border-radius: 50px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; font-size: 1.1rem;
         }
 
-        h1 { font-size: 4.5rem; margin: 0; font-weight: 900; letter-spacing: -2px; }
-        .accent { color: var(--primary); }
-        .tagline { opacity: 0.6; letter-spacing: 4px; margin-bottom: 50px; }
+        .btn-show:hover { transform: scale(1.05); box-shadow: 0 0 20px #38bdf8; }
 
-        .btn-action {
-            padding: 18px 40px; font-size: 1rem; font-weight: bold;
-            background: transparent; border: 2px solid var(--primary);
-            color: var(--primary); border-radius: 50px; cursor: pointer;
-            transition: 0.3s; text-transform: uppercase;
-        }
-
-        .btn-action:hover {
-            background: var(--primary); color: var(--bg);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
-        }
-
-        /* Dashboard Alanı */
+        /* Dashboard Alanı - Başlangıçta Kapalı */
         #dashboard {
-            display: none; grid-template-columns: 1fr 1fr;
-            gap: 30px; margin-top: 60px;
-            animation: slideUp 0.6s ease-out forwards;
+            display: none; width: 90%; max-width: 1000px;
+            margin: 50px 0; gap: 20px; z-index: 10;
         }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px; padding: 25px; backdrop-filter: blur(10px);
+            flex: 1; background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #38bdf8; border-radius: 15px;
+            padding: 20px; backdrop-filter: blur(5px);
+            min-width: 300px;
         }
 
-        .card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        
-        .data-img { width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid #475569; }
+        img { width: 100%; border-radius: 10px; border: 1px solid #334155; margin-top: 15px; }
 
-        @media (max-width: 768px) { #dashboard { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { #dashboard { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -75,62 +61,56 @@
     <div id="glow"></div>
     <canvas id="bg-canvas"></canvas>
 
-    <div class="main-container">
-        <h1>GÜROL <span class="accent">PEKMEZCİ</span></h1>
-        <p class="tagline">DATA ANALYTICS • SOFTWARE • ERP</p>
+    <div class="hero">
+        <h1>GÜROL PEKMEZCİ</h1>
+        <p>VERİ ANALİZİ VE YAZILIM PROJELERİ</p>
+        <button class="btn-show" onclick="startData()">VERİLERİ VE GRAFİKLERİ GÖR</button>
+    </div>
 
-        <button class="btn-action" onclick="activateDashboard()">Dashboard'u Görüntüle</button>
+    <div id="dashboard">
+        <div class="card">
+            <h3>Performans Analizi (CSV Verisi)</h3>
+            <canvas id="myChart"></canvas>
+        </div>
 
-        <div id="dashboard">
-            <div class="card">
-                <h3>Veri Özeti (data.csv)</h3>
-                <canvas id="chartArea"></canvas>
-                <p style="font-size: 0.8rem; opacity: 0.5; margin-top: 15px;">CSV dosyasından çekilen anlık simülasyon verileridir.</p>
-            </div>
-
-            <div class="card">
-                <h3>Analiz Çıktısı (PNG)</h3>
-                <img src="analiz_grafikleri.png" class="data-img" alt="Analiz Grafiği" 
-                     onerror="this.parentElement.innerHTML += '<p style=\'color:red\'>Hata: analiz_grafikleri.png dosyası klasörde bulunamadı!</p>'">
-            </div>
+        <div class="card">
+            <h3>Görselleştirme Çıktısı (PNG)</h3>
+            <img src="analiz_grafikleri.png" alt="Analiz Grafiği" onerror="this.src='https://via.placeholder.com/400x300?text=Görsel+Yüklenemedi'">
         </div>
     </div>
 
     <script>
-        // 1. Fare Takip Işığı
+        // 1. Işık Takibi
         const glow = document.getElementById('glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // 2. Arka Plan Hareketli Noktalar
+        // 2. Hareketli Arka Plan
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
 
         class Particle {
             constructor() {
-                this.reset();
-            }
-            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedY = Math.random() * 0.4 + 0.1;
-                this.opacity = Math.random() * 0.5 + 0.2;
+                this.v = Math.random() * 0.5 + 0.1;
             }
             update() {
-                this.y -= this.speedY;
-                if (this.y < 0) this.reset();
+                this.y -= this.v;
+                if(this.y < 0) this.y = canvas.height;
             }
             draw() {
-                ctx.fillStyle = `rgba(56, 189, 248, ${this.opacity})`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "rgba(56, 189, 248, 0.4)";
+                ctx.beginPath(); ctx.arc(this.x, this.y, 1.2, 0, Math.PI*2); ctx.fill();
             }
         }
 
-        for (let i = 0; i < 100; i++) particles.push(new Particle());
+        for(let i=0; i<100; i++) particles.push(new Particle());
 
         function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach(p => { p.update();
