@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hareketli Geometrik Arka Plan</title>
+    <style>
+        /* Modern ve temiz bir font */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a; /* Derin lacivert arka plan */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* İçerik katmanı */
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+            text-align: center;
+            pointer-events: none; /* Arka plandaki etkileşimi engellememesi için */
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="content">
+        <h1>Geleceğin Arayüzü</h1>
+        <p>Hareketli geometrik ağ yapısı ile dinamik bir deneyim.</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const properties = {
+            bgColor: 'rgba(15, 23, 42, 1)',
+            particleColor: 'rgba(56, 189, 248, 0.7)', // Açık mavi tonu
+            particleRadius: 3,
+            particleCount: 80,
+            particleMaxVelocity: 0.5,
+            lineLength: 150,
+            particleLife: 6
+        };
+
+        window.onresize = function() {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+        };
+
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.velocityX = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                this.velocityY = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+            }
+
+            position() {
+                if (this.x + this.velocityX > canvas.width || this.x + this.velocityX < 0) this.velocityX *= -1;
+                if (this.y + this.velocityY > canvas.height || this.y + this.velocityY < 0) this.velocityY *= -1;
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+            }
+
+            reDraw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, properties.particleRadius, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fillStyle = properties.particleColor;
+                ctx.fill();
+            }
+        }
+
+        function drawLines() {
+            let x, y, distance, opacity;
+            for (let i in particles) {
+                for (let j in particles) {
+                    x = particles[i].x - particles[j].x;
+                    y = particles[i].y - particles[j].y;
+                    distance = Math.sqrt(x * x + y * y);
+                    if (distance < properties.lineLength) {
+                        opacity = 1 - distance / properties.lineLength;
+                        ctx.lineWidth = '0.5';
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacity})`;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i in particles) {
+                particles[i].position();
+                particles[i].reDraw();
+            }
+            drawLines();
+            requestAnimationFrame(loop);
+        }
+
+        function init() {
+            for (let i = 0; i < properties.particleCount; i++) {
+                particles.push(new Particle());
+            }
+            loop();
+        }
+
+        init();
+    </script>
+</body>
+</html>
