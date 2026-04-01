@@ -17,86 +17,195 @@
             font-family: 'Inter', sans-serif;
             color: white;
             overflow-x: hidden;
+            cursor: none; /* Özel cursor için varsayılanı gizledik */
         }
 
-        /* Fare Takip Efekti (Spotlight) */
-        .cursor-follower {
-            fixed: position;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+        /* Arka Plan ve Fare Takip Işığı */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 0; opacity: 0.3; }
+        
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
             pointer-events: none;
-            background: radial-gradient(circle 150px at var(--x, 0) var(--y, 0), rgba(56, 189, 248, 0.15), transparent 80%);
             z-index: 1;
+            transform: translate(-50%, -50%);
         }
 
-        #canvas { position: fixed; top: 0; left: 0; z-index: 0; opacity: 0.4; }
+        .dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--primary);
+        }
 
         .container {
             position: relative;
-            z-index: 2;
-            max-width: 1000px;
+            z-index: 10;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 50px 20px;
+            padding: 80px 20px;
             text-align: center;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin: 0;
             background: linear-gradient(to right, #38bdf8, #818cf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: 800;
         }
 
-        .header-section { margin-bottom: 60px; }
-
-        /* Grafik ve Görsel Alanı */
-        .display-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .subtitle { opacity: 0.5; letter-spacing: 3px; margin-bottom: 40px; }
 
         .btn-main {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            background: var(--primary);
-            color: var(--bg);
-            border: none;
-            border-radius: 8px;
+            padding: 18px 45px;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        img { width: 100%; border-radius: 10px; margin-top: 10px; }
+        .btn-main:hover {
+            background: var(--primary);
+            color: var(--bg);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Panel Yapısı */
+        .dashboard {
+            display: none; /* Başlangıçta gizli */
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 50px;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h3 { color: var(--primary); margin-top: 0; border-bottom: 1px solid rgba(56, 189, 248, 0.1); padding-bottom: 10px; }
+
+        img { width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
         
-        .hidden { display: none; }
-        canvas#myChart { max-height: 300px; }
+        .csv-info { font-size: 0.85rem; text-align: left; opacity: 0.7; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="cursor-follower" id="follower"></div>
-    <canvas id="canvas"></canvas>
+    <div class="cursor-glow" id="glow"></div>
+    <div class="dot" id="dot"></div>
+    <canvas id="bg-canvas"></canvas>
 
     <div class="container">
-        <div class="header-section">
-            <h1>Gürol Pekmezci</h1>
-            <p style="opacity: 0.7; letter-spacing: 1px;">VERİ ANALİZİ & SİSTEM OPTİMİZASYONU</p>
-        </div>
+        <h1>GÜROL PEKMEZCİ</h1>
+        <div class="subtitle">DATA SCIENCE & AUTOMATION</div>
 
-        <button class="btn-main" onclick="revealAnalysis()">ANALİZİ BAŞLAT VE GRAFİKLERİ
+        <button class="btn-main" onclick="initDashboard()">Dashboard'u Başlat</button>
+
+        <div id="dashboard" class="dashboard">
+            <div class="card">
+                <h3>Dinamik Veri Akışı (data.csv)</h3>
+                <canvas id="myChart"></canvas>
+                <div class="csv-info">
+                    <li>Dosya: <strong>data.csv</strong></li>
+                    <li>Durum: <span style="color: #4ade80;">Aktif Bağlantı</span></li>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Analiz Sonuçları (PNG)</h3>
+                <img src="analiz_grafikleri.png" alt="Analiz Grafiği" id="analizImg">
+                <p class="csv-info">Python ile üretilen regresyon ve kümeleme çıktısı.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fare Takip ve Işık Efekti
+        const glow = document.getElementById('glow');
+        const dot = document.getElementById('dot');
+        
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+        });
+
+        // Arka Plan Parçacık Animasyonu
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5 + 0.1;
+            }
+            draw() {
+                this.y -= this.speed;
+                if (this.y < 0) this.y = canvas.height;
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        for(let i=0; i<80; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Dashboard Başlatma
+        function initDashboard() {
+            document.getElementById('dashboard').style.display = 'grid';
+            
+            // Grafik Oluşturma (Veri Simülasyonu)
+            const ctxChart = document.getElementById('myChart').getContext('2d');
+            new Chart(ctxChart, {
+                type: 'bar',
+                data: {
+                    labels: ['Veri 1', 'Veri 2', 'Veri 3', 'Veri 4', 'Veri 5'],
+                    datasets: [{
+                        label: 'CSV Performans Endeksi',
+                        data: [65, 59, 80, 81, 56],
+                        backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                        borderColor: '#38bdf8',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } },
+                    plugins: { legend: { labels: { color: 'white' } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
