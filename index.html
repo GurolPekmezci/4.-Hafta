@@ -3,59 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Data Engine</title>
+    <title>Gürol Pekmezci | Data Engine v2.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon: #00f2ff; --bg: #020617; --card: rgba(15, 23, 42, 0.9); }
+        :root { 
+            --neon: #00f2ff; 
+            --bg: #020617; 
+            --card-bg: rgba(15, 23, 42, 0.95); 
+            --border: rgba(0, 242, 255, 0.2);
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg);
             color: white;
-            font-family: 'Courier New', Courier, monospace; /* Veri teması için */
-            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden; /* Girişte kaydırmayı kapatıyoruz */
         }
 
+        /* Arka Plan Hareketli Geometri */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
 
-        /* Sayfa Geçişleri */
+        /* Sayfa Kapsayıcı (Kaydırma Efekti İçin) */
         .wrapper {
             display: flex;
             flex-direction: column;
-            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1);
             height: 200vh;
         }
 
         section { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
-        /* Sayfa 1: Giriş */
-        .hero h1 { font-size: 5rem; text-shadow: 0 0 20px var(--neon); margin-bottom: 20px; }
+        /* --- SAYFA 1: GİRİŞ (HERO) --- */
+        .hero { text-align: center; }
+        .hero h1 { 
+            font-size: clamp(3rem, 10vw, 5rem); 
+            font-weight: 900; 
+            letter-spacing: -3px;
+            background: linear-gradient(to bottom, #fff, var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .hero p { opacity: 0.5; letter-spacing: 5px; margin-bottom: 40px; text-transform: uppercase; font-size: 0.8rem;}
+
         .btn-access {
-            padding: 20px 50px; background: transparent; color: var(--neon);
-            border: 2px solid var(--neon); font-size: 1.2rem; cursor: pointer;
-            transition: 0.3s; letter-spacing: 3px;
+            padding: 18px 50px; background: transparent; color: var(--neon);
+            border: 2px solid var(--neon); border-radius: 4px; font-weight: bold;
+            cursor: pointer; transition: 0.4s; font-size: 1.1rem; letter-spacing: 2px;
         }
-        .btn-access:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 50px var(--neon); }
+        .btn-access:hover { background: var(--neon); color: var(--bg); box-shadow: 0 0 50px rgba(0, 242, 255, 0.4); transform: translateY(-3px); }
 
-        /* Sayfa 2: Data Dashboard */
-        .dashboard { background: var(--bg); overflow-y: auto; display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; padding: 40px; align-content: start; }
-        
-        .card {
-            background: var(--card); border: 1px solid #1e293b;
-            padding: 20px; border-radius: 5px; position: relative;
-            overflow: hidden;
+        /* --- SAYFA 2: DASHBOARD --- */
+        .dashboard { 
+            background: #010409; 
+            display: grid; 
+            grid-template-columns: repeat(12, 1fr); 
+            gap: 20px; 
+            padding: 40px;
+            overflow-y: auto;
+            align-content: start;
         }
-        .card-header { color: var(--neon); font-size: 0.8rem; margin-bottom: 15px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
 
-        /* Veri Seti Tablosu Görünümü */
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #94a3b8; }
-        .data-table tr { border-bottom: 1px solid #0f172a; }
-        .data-table th { text-align: left; color: var(--neon); }
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 20px; 
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .card:hover { border-color: rgba(0, 242, 255, 0.5); }
 
-        img.analysis-file { width: 100%; border: 1px solid var(--neon); filter: hue-rotate(180deg) brightness(0.8); }
+        .card-header { 
+            font-size: 0.7rem; color: var(--neon); 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; letter-spacing: 1px;
+        }
 
-        /* Aktif Sayfa Tetikleyici */
+        /* Veri Tablosu (CSV Görünümü) */
+        .csv-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: #94a3b8; }
+        .csv-table th { color: var(--neon); text-align: left; padding: 5px; border-bottom: 1px solid #1e293b;}
+        .csv-table td { padding: 5px; border-bottom: 1px solid #0f172a; }
+
+        /* Senin Analiz Görselin (PNG) */
+        .main-analysis-img { 
+            width: 100%; 
+            height: auto; 
+            border-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.5s;
+        }
+        .main-analysis-img:hover { border-color: var(--neon); transform: scale(1.01); }
+
+        /* Sayfa Geçiş Tetikleyici */
         .show-data { transform: translateY(-100vh); }
+
+        @media (max-width: 1024px) { .card { grid-column: span 12 !important; } }
     </style>
 </head>
 <body>
@@ -65,85 +110,12 @@
     <div class="wrapper" id="mainWrapper">
         
         <section class="hero">
-            <p style="color: var(--neon); margin-bottom: 10px;">> SYSTEM STATUS: READY</p>
+            <p>> SYSTEM STATUS: ONLINE</p>
             <h1>GÜROL PEKMEZCİ</h1>
             <button class="btn-access" onclick="launchSystem()">EXECUTE DATA_SCAN</button>
         </section>
 
         <section class="dashboard">
-            <div style="grid-column: span 12; display: flex; justify-content: space-between; color: var(--neon);">
-                <span>[ DATABASE ACCESS GRANTED ]</span>
-                <span onclick="location.reload()" style="cursor:pointer;">[ TERMINATE ]</span>
-            </div>
-
-            <div class="card" style="grid-column: span 4; height: 350px; overflow: auto;">
-                <div class="card-header">RAW_DATASET (data.csv)</div>
-                <table class="data-table" id="csvTable">
-                    <thead><tr><th>ID</th><th>VAL_X</th><th>VAL_Y</th><th>STAT</th></tr></thead>
-                    <tbody id="tableBody">
-                        </tbody>
-                </table>
-            </div>
-
-            <div class="card" style="grid-column: span 4; height: 350px;">
-                <div class="card-header">ANALYTICS_CHART</div>
-                <canvas id="mainChart"></canvas>
-            </div>
-
-            <div class="card" style="grid-column: span 4; height: 350px;">
-                <div class="card-header">VISUAL_OUTPUT (analiz_grafikleri.png)</div>
-                <img src="analiz_grafikleri.png" class="analysis-file" alt="Analiz" onerror="this.src='https://via.placeholder.com/400x300/020617/00f2ff?text=PNG_FILE_NOT_FOUND'">
-            </div>
-
-            <div class="card" style="grid-column: span 12;">
-                <div class="card-header">SYSTEM_LOG</div>
-                <p style="font-size: 0.8rem; color: #4ade80;">> Veri setleri başarıyla yüklendi. K-Means kümeleme algoritması %98.2 doğrulukla çalıştırıldı. Grafik çıktıları analiz_grafikleri.png dosyasına kaydedildi.</p>
-            </div>
-        </section>
-
-    </div>
-
-    <script>
-        // Arka Plan Matrix Efekti
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let points = [];
-        for(let i=0; i<70; i++) points.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2});
-
-        function anim() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "#00f2ff";
-            points.forEach(p => {
-                p.y -= p.s; if(p.y < 0) p.y = canvas.height;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.s/2, 0, Math.PI*2); ctx.fill();
-            });
-            requestAnimationFrame(anim);
-        }
-        anim();
-
-        // Sistem Başlatma
-        function launchSystem() {
-            document.getElementById('mainWrapper').classList.add('show-data');
-            document.body.style.overflow = "auto";
-            
-            // Tabloyu Doldur (data.csv simülasyonu)
-            const body = document.getElementById('tableBody');
-            for(let i=0; i<15; i++) {
-                body.innerHTML += `<tr><td>#0${i}</td><td>${(Math.random()*100).toFixed(2)}</td><td>${(Math.random()*50).toFixed(2)}</td><td style="color:#4ade80;">PASS</td></tr>`;
-            }
-
-            // Grafik Çiz
-            const chartCtx = document.getElementById('mainChart').getContext('2d');
-            new Chart(chartCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Hız', 'Doğruluk', 'Hata', 'Bellek', 'İşlem'],
-                    datasets: [{ label: 'Performans', data: [80, 95, 10, 70, 85], borderColor: '#00f2ff', backgroundColor: 'rgba(0, 242, 255, 0.2)' }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { r: { grid: { color: '#1e293b' }, angleLines: { color: '#1e293b' }, pointLabels: { color: '#94a3b8' }, ticks: { display: false } } } }
-            });
-        }
-    </script>
-</body>
-</html>
+            <div style="grid-column: span 12; display:flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid #1e293b; margin-bottom: 10px;">
+                <h2 style="font-size: 1rem; color: var(--neon); font-weight: bold;">[ DATABASE ACCESS GRANTED ]</h2>
+                <button onclick="location.reload()" style="background:none; border:none; color:#ef4444; cursor:pointer; font
