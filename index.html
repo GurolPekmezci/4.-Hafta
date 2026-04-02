@@ -62,6 +62,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
+        /* PROFİL FOTOĞRAFI */
         .profile-img {
             width: 130px;
             height: 130px;
@@ -167,7 +168,7 @@
 </div>
 
 <script>
-    // ARKA PLAN ŞEKİLLERİNİ OLUŞTUR
+    // Arkaplan geometrik şekilleri oluşturma
     const bg = document.getElementById('bg-shapes');
     for (let i = 0; i < 20; i++) {
         const shape = document.createElement('div');
@@ -182,7 +183,7 @@
         bg.appendChild(shape);
     }
 
-    // 404 HATASINI ÖNLEYEN VE VERİLERİ ÇEKEN FONKSİYON
+    // data.csv dosyasını okuyan ve tabloya basan fonksiyon
     function toggleData() {
         const display = document.getElementById('data-display');
         const tableDiv = document.getElementById('csv-table');
@@ -192,7 +193,7 @@
         } else {
             display.style.display = 'block';
             
-            // Dosya adını klasöründeki 'data.csv' ile eşitledim
+            // fetch isteği data.csv olarak güncellendi
             fetch('data.csv')
             .then(response => {
                 if (!response.ok) throw new Error("Dosya bulunamadı");
@@ -202,12 +203,12 @@
                 const rows = data.split('\n').filter(r => r.trim() !== "");
                 let html = '<table><thead><tr>';
                 
-                // Başlıklar
+                // Başlıklar (Oyuncu_ID, Yorgunluk_Endeksi, Basari_Orani)
                 const headers = rows[0].split(',');
                 headers.forEach(h => html += `<th>${h}</th>`);
                 html += '</tr></thead><tbody>';
 
-                // İlk 30 satırı göster
+                // İlk 30 satırı listele
                 for (let i = 1; i < Math.min(rows.length, 31); i++) {
                     html += '<tr>';
                     rows[i].split(',').forEach(c => html += `<td>${c}</td>`);
@@ -217,7 +218,7 @@
                 tableDiv.innerHTML = html;
             })
             .catch(err => {
-                tableDiv.innerHTML = `<p style="padding:20px; color:#ff4d4d; text-align:center;">Hata: data.csv dosyasına ulaşılamadı. Lütfen GitHub klasöründe dosya adının tam olarak 'data.csv' olduğundan emin olun.</p>`;
+                tableDiv.innerHTML = `<p style="padding:20px; color:#ff4d4d; text-align:center;">Hata: data.csv dosyasına ulaşılamadı.</p>`;
             });
         }
     }
