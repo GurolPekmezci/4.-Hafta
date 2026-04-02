@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Portfolyo Dashboard</title>
+    <title>Gürol Pekmezci | Portfolyo</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00d2ff; /* Neon Mavi */
-            --secondary: #92fe9d; /* Neon Yeşil */
+            --primary: #00d2ff;
+            --secondary: #92fe9d;
             --bg-dark: #0f0c29;
-            --text-main: #ffffff;
-            --text-sub: #bdc3c7;
         }
 
         * {
@@ -24,210 +22,192 @@
         body {
             background: var(--bg-dark);
             height: 100vh;
-            overflow: hidden; /* Şekillerin taşmaması için */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--text-main);
+            color: white;
             position: relative;
         }
 
         /* --- HAREKETLİ GEOMETRİK ARKAPLAN --- */
-        .background-shapes {
+        #bg-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1; /* Konteynerin arkasında kalmalı */
+            z-index: 1;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         }
 
         .shape {
             position: absolute;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: floatShape infinite linear;
-            border-radius: 10px;
+            animation: move infinite linear;
+            pointer-events: none;
         }
 
-        /* Farklı şekiller ve animasyon süreleri */
-        .shape:nth-child(1) { width: 80px; height: 80px; top: 20%; left: 10%; animation-duration: 25s; border-radius: 50%; }
-        .shape:nth-child(2) { width: 120px; height: 120px; top: 70%; left: 80%; animation-duration: 30s; animation-delay: -5s; }
-        .shape:nth-child(3) { width: 60px; height: 60px; top: 40%; left: 50%; animation-duration: 20s; animation-delay: -2s; transform: rotate(45deg); }
-        .shape:nth-child(4) { width: 100px; height: 100px; top: 85%; left: 15%; animation-duration: 35s; border-radius: 20%; }
-        .shape:nth-child(5) { width: 50px; height: 50px; top: 10%; left: 85%; animation-duration: 18s; animation-delay: -8s; border-radius: 50%; }
-
-        @keyframes floatShape {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
-            50% { transform: translateY(-100px) rotate(180deg); opacity: 0.5; }
-            100% { transform: translateY(0) rotate(360deg); opacity: 0.2; }
+        @keyframes move {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-1000px) rotate(360deg); opacity: 0; }
         }
 
-        /* --- PORTFOLYO KONTEYNERİ (GLASSMORPHISM) --- */
+        /* --- ANA KONTEYNER --- */
         .container {
             position: relative;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 30px;
-            padding: 50px;
-            max-width: 850px;
+            padding: 50px 40px;
+            max-width: 800px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
-            z-index: 10; /* Şekillerin önünde kalmalı */
-            transition: transform 0.3s ease;
-        }
-
-        /* Profil Fotoğrafı Alanı - DÜZELTİLDİ */
-        .profile-area {
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
         .profile-img {
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            object-fit: cover; /* Resmi sığdırır */
+            object-fit: cover;
             border: 4px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .profile-img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.8);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            margin-bottom: 20px;
         }
 
         h1 {
             font-size: 2.8rem;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
         .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-sub);
-            margin-bottom: 40px;
             font-weight: 300;
-            text-transform: uppercase;
             letter-spacing: 3px;
+            color: #bdc3c7;
+            margin-bottom: 35px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
-        /* --- LİNKLER GRİD --- */
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
             border-radius: 20px;
             text-decoration: none;
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
         }
 
         .card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-12px);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-10px);
             border-color: var(--primary);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
         }
 
         .card strong {
-            display: block;
-            font-size: 1.3rem;
-            margin-bottom: 8px;
+            font-size: 1.1rem;
             color: var(--primary);
-            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
         .card span {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            opacity: 0.8;
+            font-size: 0.8rem;
+            opacity: 0.6;
         }
 
-        /* Veri Seti Kartı Özel Renk */
-        .data-card:hover {
-            border-color: var(--secondary);
-            box-shadow: 0 15px 30px rgba(146, 254, 157, 0.2);
-        }
+        /* Veri Seti Kartı */
+        .data-card:hover { border-color: var(--secondary); }
         .data-card strong { color: var(--secondary); }
 
         footer {
-            margin-top: 50px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.3);
+            margin-top: 40px;
+            font-size: 0.75rem;
+            opacity: 0.4;
         }
     </style>
 </head>
 <body>
 
-    <div class="background-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
+    <div id="bg-canvas"></div>
 
     <div class="container">
+        <img src="resimler.jpeg" alt="Gürol Pekmezci" class="profile-img">
         
-        <div class="profile-area">
-            <img src="resimler.jpeg" alt="Gürol Pekmezci Profil Fotoğrafı" class="profile-img">
-            <h1>GÜROL PEKMEZCİ</h1>
-        </div>
-
-        <p class="subtitle">Data Engineer & Developer</p>
+        <h1>GÜROL PEKMEZCİ</h1>
+        <p class="subtitle">Data Engine & Software Developer</p>
 
         <div class="links-grid">
             <a href="labirent.html" class="card">
-                <strong>🎮 MAZE GAME</strong>
-                <span>Uygulamayı Başlat</span>
+                <strong>🎮 LABİRENT OYUNU</strong>
+                <span>Projeyi Çalıştır</span>
             </a>
 
-            <a href="https://raw.githubusercontent.com/GurolPekmezci/4.-Hafta/main/veri.csv" class="card data-card" target="_blank" download="veri.csv">
+            <a href="https://raw.githubusercontent.com/GurolPekmezci/4.-Hafta/main/veri.csv" class="card data-card" target="_blank">
                 <strong>📊 VERİ SETİ (CSV)</strong>
-                <span>Dosyayı İncele / İndir</span>
+                <span>Dosyayı İncele</span>
             </a>
 
             <a href="analiz_grafikleri.png" class="card" target="_blank">
                 <strong>📈 ANALİZLER</strong>
-                <span>Grafikleri Görüntüle</span>
+                <span>Grafikleri Gör</span>
             </a>
 
-            <a href="https://github.com/GurolPekmezci/4.-Hafta" class="card" target="_blank">
-                <strong>📂 GITHUB REPO</strong>
-                <span>Kaynak Kodlar</span>
+            <a href="https://github.com/GurolPekmezci" class="card" target="_blank">
+                <strong>📂 GITHUB</strong>
+                <span>Kod Arşivi</span>
             </a>
         </div>
 
         <footer>
-            GÜROL PEKMEZCİ PROJECT DASHBOARD © 2026
+            DASHBOARD PORTFOLIO © 2026
         </footer>
     </div>
 
+    <script>
+        // Arkaplanda rastgele geometrik şekiller oluşturan script
+        const canvas = document.getElementById('bg-canvas');
+        const shapeCount = 15;
+
+        for (let i = 0; i < shapeCount; i++) {
+            const shape = document.createElement('div');
+            shape.classList.add('shape');
+            
+            // Rastgele boyut ve tip (yuvarlak veya kare)
+            const size = Math.random() * 80 + 20;
+            shape.style.width = `${size}px`;
+            shape.style.height = `${size}px`;
+            if (Math.random() > 0.5) shape.style.borderRadius = '50%';
+            
+            // Rastgele pozisyon
+            shape.style.left = `${Math.random() * 100}%`;
+            shape.style.top = `${Math.random() * 100 + 100}%`;
+            
+            // Rastgele hız ve gecikme
+            shape.style.animationDuration = `${Math.random() * 10 + 10}s`;
+            shape.style.animationDelay = `${Math.random() * 5}s`;
+            
+            canvas.appendChild(shape);
+        }
+    </script>
 </body>
 </html>
