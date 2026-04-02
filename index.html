@@ -62,25 +62,32 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
+        /* PROFİL FOTOĞRAFI - TAM DÜZELTME */
         .profile-img {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary);
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
-            margin-bottom: 15px;
+            width: 140px; /* Biraz daha belirgin boy */
+            height: 140px;
+            border-radius: 50%; /* Yuvarlak */
+            object-fit: cover; /* Resmi sığdırır */
+            border: 4px solid var(--primary); /* Neon mavi çerçeve */
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.5); /* Hafif parlama */
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05); /* Üzerine gelince büyüme */
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
-        .subtitle { color: #aaa; letter-spacing: 2px; font-size: 0.8rem; margin-bottom: 30px; }
+        .subtitle { color: #aaa; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 35px; }
 
         /* BUTONLAR */
         .links-grid {
@@ -92,12 +99,12 @@
 
         .card {
             background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
+            padding: 18px;
             border-radius: 15px;
             text-decoration: none;
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
+            transition: all 0.3s;
             cursor: pointer;
             font-weight: 600;
             display: flex;
@@ -129,11 +136,11 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th { background: var(--primary); color: #000; padding: 12px; position: sticky; top: 0; }
         td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
 
-        footer { margin-top: 30px; opacity: 0.3; font-size: 0.7rem; }
+        footer { margin-top: 40px; opacity: 0.3; font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -141,17 +148,17 @@
 <div id="bg-shapes"></div>
 
 <div class="container">
-    <img src="./resimler.jpeg" alt="Gürol Pekmezci" class="profile-img">
+    <img src="resimler.jpeg" alt="Gürol Pekmezci" class="profile-img">
     
     <h1>GÜROL PEKMEZCİ</h1>
     <p class="subtitle">DATA ENGINE DASHBOARD</p>
 
     <div class="links-grid">
-        <a href="./labirent.html" class="card">🎮 OYUN</a>
+        <a href="labirent.html" class="card">🎮 OYUN</a>
         
         <div class="card" onclick="toggleData()">📊 VERİLERİ GÖR</div>
         
-        <a href="./analiz_grafikleri.png" target="_blank" class="card">📈 GRAFİKLER</a>
+        <a href="analiz_grafikleri.png" target="_blank" class="card">📈 GRAFİKLER</a>
         
         <a href="https://github.com/GurolPekmezci/4.-Hafta" target="_blank" class="card">📂 GITHUB</a>
     </div>
@@ -167,22 +174,22 @@
 </div>
 
 <script>
-    // ARKA PLAN ANİMASYONU
+    // ARKA PLAN ŞEKİLLERİNİ OLUŞTUR
     const bg = document.getElementById('bg-shapes');
     for (let i = 0; i < 20; i++) {
         const shape = document.createElement('div');
         shape.classList.add('shape');
-        const size = Math.random() * 60 + 20;
+        const size = Math.random() * 70 + 20;
         shape.style.width = size + 'px';
         shape.style.height = size + 'px';
         if (Math.random() > 0.5) shape.style.borderRadius = '50%';
         shape.style.left = Math.random() * 100 + '%';
-        shape.style.animationDuration = (Math.random() * 12 + 8) + 's';
+        shape.style.animationDuration = (Math.random() * 10 + 10) + 's';
         shape.style.animationDelay = '-' + (Math.random() * 10) + 's';
         bg.appendChild(shape);
     }
 
-    // VERİLERİ ÇEKME FONKSİYONU
+    // 404 HATASINI ÖNLEYEN VE VERİLERİ ÇEKEN FONKSİYON
     function toggleData() {
         const display = document.getElementById('data-display');
         const tableDiv = document.getElementById('csv-table');
@@ -192,32 +199,32 @@
         } else {
             display.style.display = 'block';
             
-            // Yol hatasını önlemek için ./data.csv kullanıldı
-            fetch('./data.csv')
+            // Dosyanın klasördeki adı 'data.csv' olduğu için link 'data.csv' olarak sabitlendi
+            fetch('data.csv')
             .then(response => {
-                if (!response.ok) throw new Error("Dosya bulunamadı (404)");
+                if (!response.ok) throw new Error("Dosya bulunamadı");
                 return response.text();
             })
             .then(data => {
                 const rows = data.split('\n').filter(r => r.trim() !== "");
-                if (rows.length === 0) throw new Error("Dosya boş");
-
                 let html = '<table><thead><tr>';
+                
+                // Başlıklar
                 const headers = rows[0].split(',');
-                headers.forEach(h => html += `<th>${h.trim()}</th>`);
+                headers.forEach(h => html += `<th>${h}</th>`);
                 html += '</tr></thead><tbody>';
 
-                // İlk 30 satır
+                // Veriler (İlk 30 satır)
                 for (let i = 1; i < Math.min(rows.length, 31); i++) {
                     html += '<tr>';
-                    rows[i].split(',').forEach(c => html += `<td>${c.trim()}</td>`);
+                    rows[i].split(',').forEach(c => html += `<td>${c}</td>`);
                     html += '</tr>';
                 }
                 html += '</tbody></table>';
                 tableDiv.innerHTML = html;
             })
             .catch(err => {
-                tableDiv.innerHTML = `<p style="padding:20px; color:#ff4d4d; text-align:center;">Hata: ${err.message}. <br>Lütfen GitHub klasöründe 'data.csv' dosyasının olduğundan emin ol.</p>`;
+                tableDiv.innerHTML = `<p style="padding:20px; color:#ff4d4d; text-align:center;">Hata: data.csv dosyasına ulaşılamadı. Lütfen GitHub klasöründe dosya adının tam olarak 'data.csv' olduğundan emin olun.</p>`;
             });
         }
     }
