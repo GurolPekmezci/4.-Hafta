@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gürol Pekmezci | Portfolyo</title>
+    <title>Gürol Pekmezci | Portfolyo Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00d2ff;
-            --secondary: #92fe9d;
+            --primary: #00d2ff; /* Neon Mavi */
+            --secondary: #92fe9d; /* Neon Yeşil */
             --bg-dark: #0f0c29;
+            --text-main: #ffffff;
+            --text-sub: #bdc3c7;
         }
 
         * {
@@ -26,122 +28,165 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: var(--text-main);
+            position: relative;
         }
 
         /* --- HAREKETLİ GEOMETRİK ARKAPLAN --- */
-        .background {
+        .background-shapes {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 1; /* Konteynerin arkasında kalmalı */
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         }
 
         .shape {
             position: absolute;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: move 20s infinite linear;
+            animation: floatShape infinite linear;
+            border-radius: 10px;
         }
 
-        .shape:nth-child(1) { width: 100px; height: 100px; top: 10%; left: 10%; border-radius: 20%; }
-        .shape:nth-child(2) { width: 150px; height: 150px; top: 70%; left: 80%; border-radius: 50%; animation-duration: 25s; }
-        .shape:nth-child(3) { width: 80px; height: 80px; top: 40%; left: 50%; transform: rotate(45deg); animation-duration: 15s; }
-        .shape:nth-child(4) { width: 120px; height: 120px; top: 80%; left: 20%; border-radius: 30%; animation-delay: -5s; }
+        /* Farklı şekiller ve animasyon süreleri */
+        .shape:nth-child(1) { width: 80px; height: 80px; top: 20%; left: 10%; animation-duration: 25s; border-radius: 50%; }
+        .shape:nth-child(2) { width: 120px; height: 120px; top: 70%; left: 80%; animation-duration: 30s; animation-delay: -5s; }
+        .shape:nth-child(3) { width: 60px; height: 60px; top: 40%; left: 50%; animation-duration: 20s; animation-delay: -2s; transform: rotate(45deg); }
+        .shape:nth-child(4) { width: 100px; height: 100px; top: 85%; left: 15%; animation-duration: 35s; border-radius: 20%; }
+        .shape:nth-child(5) { width: 50px; height: 50px; top: 10%; left: 85%; animation-duration: 18s; animation-delay: -8s; border-radius: 50%; }
 
-        @keyframes move {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(50px, 100px) rotate(180deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+        @keyframes floatShape {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 0.5; }
+            100% { transform: translateY(0) rotate(360deg); opacity: 0.2; }
         }
 
-        /* --- KONTEYNER VE KARTLAR --- */
+        /* --- PORTFOLYO KONTEYNERİ (GLASSMORPHISM) --- */
         .container {
             position: relative;
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px;
-            padding: 60px 40px;
-            max-width: 800px;
+            padding: 50px;
+            max-width: 850px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
-            z-index: 10;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            z-index: 10; /* Şekillerin önünde kalmalı */
+            transition: transform 0.3s ease;
+        }
+
+        /* Profil Fotoğrafı Alanı - DÜZELTİLDİ */
+        .profile-area {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .profile-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover; /* Resmi sığdırır */
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.8);
         }
 
         h1 {
-            font-size: 3rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            font-size: 2.8rem;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
 
         .subtitle {
-            font-weight: 300;
-            letter-spacing: 4px;
-            color: #ccc;
+            font-size: 1.1rem;
+            color: var(--text-sub);
             margin-bottom: 40px;
+            font-weight: 300;
             text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
+        /* --- LİNKLER GRİD --- */
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 30px;
             border-radius: 20px;
             text-decoration: none;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-12px);
             border-color: var(--primary);
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
 
         .card strong {
             display: block;
-            font-size: 1.2rem;
-            margin-bottom: 5px;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
             color: var(--primary);
+            letter-spacing: 1px;
         }
 
         .card span {
-            font-size: 0.8rem;
-            opacity: 0.6;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            opacity: 0.8;
         }
 
-        /* Veri Seti Kartı Vurgusu */
+        /* Veri Seti Kartı Özel Renk */
+        .data-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 15px 30px rgba(146, 254, 157, 0.2);
+        }
         .data-card strong { color: var(--secondary); }
 
         footer {
             margin-top: 50px;
-            font-size: 0.7rem;
-            opacity: 0.4;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body>
 
-    <div class="background">
+    <div class="background-shapes">
+        <div class="shape"></div>
         <div class="shape"></div>
         <div class="shape"></div>
         <div class="shape"></div>
@@ -149,18 +194,23 @@
     </div>
 
     <div class="container">
-        <h1>GÜROL PEKMEZCİ</h1>
-        <p class="subtitle">Data & Software Developer</p>
+        
+        <div class="profile-area">
+            <img src="resimler.jpeg" alt="Gürol Pekmezci Profil Fotoğrafı" class="profile-img">
+            <h1>GÜROL PEKMEZCİ</h1>
+        </div>
+
+        <p class="subtitle">Data Engineer & Developer</p>
 
         <div class="links-grid">
             <a href="labirent.html" class="card">
-                <strong>🎮 LABİRENT OYUNU</strong>
+                <strong>🎮 MAZE GAME</strong>
                 <span>Uygulamayı Başlat</span>
             </a>
 
-            <a href="./veri.csv" class="card data-card" download>
+            <a href="https://raw.githubusercontent.com/GurolPekmezci/4.-Hafta/main/veri.csv" class="card data-card" target="_blank" download="veri.csv">
                 <strong>📊 VERİ SETİ (CSV)</strong>
-                <span>Dosyayı İndir / İncele</span>
+                <span>Dosyayı İncele / İndir</span>
             </a>
 
             <a href="analiz_grafikleri.png" class="card" target="_blank">
@@ -168,14 +218,14 @@
                 <span>Grafikleri Görüntüle</span>
             </a>
 
-            <a href="https://github.com/GurolPekmezci" class="card" target="_blank">
-                <strong>📂 GITHUB</strong>
-                <span>Tüm Kod Arşivi</span>
+            <a href="https://github.com/GurolPekmezci/4.-Hafta" class="card" target="_blank">
+                <strong>📂 GITHUB REPO</strong>
+                <span>Kaynak Kodlar</span>
             </a>
         </div>
 
         <footer>
-            PROJE DASHBOARD © 2026
+            GÜROL PEKMEZCİ PROJECT DASHBOARD © 2026
         </footer>
     </div>
 
